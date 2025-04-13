@@ -1,20 +1,19 @@
-import 'package:depi1/views/home_view.dart';
-import 'package:depi1/views/home/home.dart';
-import 'package:depi1/views/splash/test1.dart';
+import 'package:depi1/views/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
-import 'views/splash/splash_screen.dart';
+void main() => runApp(const Salaty());
 
-void main() => runApp(SalatyAwalan());
+class Salaty extends StatelessWidget {
+  const Salaty({super.key});
 
-class SalatyAwalan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
+    return const ScreenUtilInit(
       designSize: Size(402, 880),
       minTextAdapt: true,
-      child: MaterialApp(
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         home: SplashScreen(),
       ),

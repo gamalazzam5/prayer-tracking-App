@@ -1,8 +1,8 @@
 class PrayerModel {
-  final DateTime time;
+   DateTime time;
   final String amOrPm;
-  final String status;
-  final String iconStatusUrl;
+   String status;
+   String iconStatusUrl;
   final String prayerNameAr;
   final String prayerNameEN;
   final String prayerIcon;

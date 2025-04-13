@@ -1,112 +1,70 @@
-import 'package:depi1/views/home/home.dart';
+import 'package:depi1/controller/home_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../resources/colors.dart';
 import '../resources/text_style.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
-
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  int myIndex = 0;
-  final List<Widget> _screens = [
-    HomePage(),
-    Container(),
-    Container(),
-    Container(),
-
-  ];
-  void _onItemTapped(int index) {
-    setState(() {
-      myIndex = index;
-    });
-  }
+class HomeView extends StatelessWidget {
+  HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-
-      backgroundColor: Color(0xffFAF8F2),
-      body: Container(
+    return GetBuilder<HomeViewController>(
+      init: HomeViewController(),
+      builder: (controller) => Scaffold(
+        backgroundColor: const Color(0xffFAF8F2),
+        body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/pattern.png'),
-                fit: BoxFit.cover,
-                opacity: .07),
+              image: AssetImage('assets/images/pattern.png'),
+              fit: BoxFit.cover,
+              opacity: .07,
+            ),
           ),
-          child: _screens[myIndex]),
-      bottomNavigationBar: ClipRRect(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(15.r),
-        topRight: Radius.circular(15.r),
-      ),
-      child: Container(
-        height: 87.h,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black,
-              blurRadius: 15.r,
-              spreadRadius: 0.r,
-            ),
-          ],
+          child: IndexedStack(
+            index: controller.myIndex,
+            children: controller.screens,
+          ),
         ),
-        child: BottomNavigationBar(
-          onTap: (index) {
-            setState(() {
-              myIndex = index;
-            });
-          },
-          currentIndex: myIndex,
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                "assets/images/icons/mosque.png",
-                height: 24.h,
-                width: 24.w,
-                color: myIndex == 0 ? ColorManger.greenColor : Color(0xff8789A3),
+        bottomNavigationBar: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25.r),
+            topRight: Radius.circular(25.r),
+          ),
+          child: Container(
+            height: 87.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25.r),
+                topRight: Radius.circular(25.r),
               ),
-              label: "الرئيسية",
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10.r,
+                  spreadRadius: 2.r,
+                  offset: const Offset(0, -3),
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "assets/images/icons/kaaba.png",
-                  height: 24.h,
-                  width: 24.w,
-                  color:
-                  myIndex == 1 ? ColorManger.greenColor : Color(0xff8789A3),
-                ),
-                label: "القِبْلَة"),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  "assets/images/icons/statics.png",
-                  height: 24.h,
-                  width: 24.w,
-                  color:
-                  myIndex == 2 ? ColorManger.greenColor : Color(0xff8789A3),
-                ),
-                label: "الاحصائيات"),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
-                  size: 24.sp,
-                  color:
-                  myIndex == 3 ? ColorManger.greenColor : Color(0xff8789A3),
-                ),
-                label: "الإعدادات"),
-          ],
-          showUnselectedLabels: true,
-          selectedItemColor: ColorManger.greenColor,
-          unselectedItemColor: Color(0xff8789A3),
-          selectedLabelStyle: TextStyles.bottomNavTextSelceted,
-          unselectedLabelStyle: TextStyles.bottomNavTextUnSelceted,
+            child: BottomNavigationBar(
+              onTap: controller.onItemTapped,
+              currentIndex: controller.myIndex,
+              items: controller.buildNavItems(),
+              showUnselectedLabels: true,
+              selectedItemColor: ColorManger.greenColor,
+              unselectedItemColor: const Color(0xff8789A3),
+              selectedLabelStyle: TextStyles.bottomNavTextUnSelceted,
+              unselectedLabelStyle: TextStyles.bottomNavTextUnSelceted,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              type: BottomNavigationBarType.fixed,
+            ),
+          ),
         ),
       ),
-    ),);
+    );
   }
 }

@@ -7,6 +7,7 @@ class ColorManger {
   static const Color greenColor0 = Color(0xFF1E5B4A);
   static const Color brawenColor = Color(0xFFAC8935);
   static const Color brawenColor0 = Color(0xFF9B7B30);
+  static const Color yellowColor=Color(0xffB48C2D);
   static const Color blackColor1 = Color(0xff141417);
   static const Color blackColor2 = Color(0xff344054);
 

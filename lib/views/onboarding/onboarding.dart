@@ -4,8 +4,9 @@ import 'package:depi1/views/home_view.dart';
 import 'package:depi1/views/onboarding/onboarding_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../resources/text_style.dart';
-import '../home/home.dart';
+
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -127,7 +128,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   children: List.generate(
                     _onboarding.length,
                         (index) => Padding(
-                      padding:  EdgeInsets.all(5.0.w),
+                      padding:  EdgeInsets.all(5.0.w.h),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         width: _pageIndex == index ? 30.w : 14.w,
@@ -147,9 +148,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeView()),
+                    Get.offAll(  HomeView()
                     );
                   },
                   child: Text(
@@ -164,10 +163,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               child: GestureDetector(
                 onTap: () {
                   if (_pageIndex == _onboarding.length - 1) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeView()),
-                    );
+                   Get.offAll(  HomeView());
                   } else {
                     _pageController.nextPage(
                         duration: const Duration(milliseconds: 300),
