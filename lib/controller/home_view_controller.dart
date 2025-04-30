@@ -5,14 +5,15 @@ import 'package:get/get.dart';
 import '../resources/colors.dart';
 import '../views/Static_page/static_page.dart';
 import '../views/home/home.dart';
-import '../views/qibla_page/qiblah.dart';
+import '../views/qibla_page/build_qiblah.dart';
+
 
 class HomeViewController extends GetxController {
   int myIndex = 0;
 
   final List<Widget> screens = [
     HomePage(),
-    QiblaCompass(),
+    BuildQiblah(),
     StaticPage(),
     Container(),
   ];
@@ -55,3 +56,11 @@ class HomeViewController extends GetxController {
     );
   }
 }
+
+
+
+
+
+
+
+
