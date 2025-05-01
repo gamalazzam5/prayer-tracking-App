@@ -43,6 +43,7 @@ class Calendar extends StatelessWidget {
           Obx(() => dateController.canIncrementDate()? IconButton(
               onPressed: () {
                 dateController.changeDate(1);
+
               },
               icon: Icon(
                 Icons.arrow_forward_ios,

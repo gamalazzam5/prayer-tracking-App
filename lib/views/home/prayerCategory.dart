@@ -2,6 +2,8 @@ import 'package:depi1/views/home/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import '../../controller/calender_controller.dart';
 import '../../models/prayers_model.dart';
 import '../../resources/colors.dart';
 import '../../resources/text_style.dart';
@@ -18,30 +20,35 @@ class PrayerCategory extends StatefulWidget {
 
 class _PrayerCategoryState extends State<PrayerCategory> {
   bool showNextPrayer = false;
+  final DateController dateController = Get.find<DateController>();
 
   @override
   void initState() {
     super.initState();
     _updateNextPrayer();
+    ever(dateController.selectedDate, (_) => _updateNextPrayer());
   }
 
   void _updateNextPrayer() {
     DateTime now = DateTime.now();
+    DateTime selectedDate = dateController.selectedDate.value;
     int nextPrayerIndex = -1;
 
-    for (int i = 0; i < widget.prayerItem.length; i++) {
-      if (now.isBefore(widget.prayerItem[i].time)) {
-        nextPrayerIndex = i;
-        break;
+    bool isToday = selectedDate.year == now.year &&
+        selectedDate.month == now.month &&
+        selectedDate.day == now.day;
+
+    if (isToday) {
+      for (int i = 0; i < widget.prayerItem.length; i++) {
+        if (now.isBefore(widget.prayerItem[i].time)) {
+          nextPrayerIndex = i;
+          break;
+        }
       }
     }
-// if it loop for all items back to index 0
-    // if (nextPrayerIndex == -1) {
-    //   nextPrayerIndex = 0;
-    // }
 
     setState(() {
-      showNextPrayer = (widget.index == nextPrayerIndex);
+      showNextPrayer = isToday && (widget.index == nextPrayerIndex);
     });
   }
 
@@ -59,8 +66,7 @@ class _PrayerCategoryState extends State<PrayerCategory> {
       height: 88.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.r),
-        color:
-            showNextPrayer ? const Color(0xff9B7B30) : const Color(0xffffffff),
+        color: showNextPrayer ? const Color(0xff9B7B30) : const Color(0xffffffff),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -103,15 +109,19 @@ class _PrayerCategoryState extends State<PrayerCategory> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 8.h,
-                ),
-
-                ///here condition will be  if index of selectedPrayer > here index
+                SizedBox(height: 8.h),
                 GestureDetector(
                   onTap: () {
                     DateTime now = DateTime.now();
-                    if (widget.prayerItem[widget.index].time.isBefore(now)) {
+                    DateTime selectedDate = dateController.selectedDate.value;
+                    // Check if the selected date is today
+                    bool isToday = selectedDate.year == now.year &&
+                        selectedDate.month == now.month &&
+                        selectedDate.day == now.day;
+
+                    // If it's today, only allow status change for past prayers
+                    // If it's a past date, allow status change for all prayers
+                    if (!isToday || widget.prayerItem[widget.index].time.isBefore(now)) {
                       showDialog(
                         context: context,
                         builder: (context) {
@@ -133,67 +143,58 @@ class _PrayerCategoryState extends State<PrayerCategory> {
                     ),
                     child: showNextPrayer
                         ? Container(
-                            width: 95.w,
-                            height: 36.h,
-                            decoration: BoxDecoration(
-                              color: const Color(0xff1E5B4A),
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "استعد للصلاه",
-                                  style: TextStyles.registerStyle,
-                                ),
-                              ],
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                widget.prayerItem[widget.index].status,
-                                style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: "Tajawal",
-                                    color: widget.prayerItem[widget.index]
-                                                .status ==
-                                            "منفردا"
-                                        ? const Color(0xff248DDE)
-                                        : widget.prayerItem[widget.index]
-                                                    .status ==
-                                                "لم اصلي"
-                                            ? const Color(0xffC92B2B)
-                                            : widget.prayerItem[widget.index]
-                                                        .status ==
-                                                    "متأخر"
-                                                ? const Color(0xffCF9C00)
-                                                : widget
-                                                            .prayerItem[
-                                                                widget.index]
-                                                            .status ==
-                                                        "جماعه"
-                                                    ? const Color(0xff1E5B4A)
-                                                    : ColorManger.blackColor1),
-                              ),
-                              SizedBox(
-                                width: 5.w,
-                              ),
-                              SvgPicture.asset(
-                                widget.prayerItem[widget.index].iconStatusUrl,
-                                width: 24.w,
-                                height: 24.h,
-                              ),
-                            ],
+                      width: 95.w,
+                      height: 36.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff1E5B4A),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "استعد للصلاه",
+                            style: TextStyles.registerStyle,
                           ),
+                        ],
+                      ),
+                    )
+                        : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.prayerItem[widget.index].status,
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Tajawal",
+                              color: widget.prayerItem[widget.index].status ==
+                                  "منفردا"
+                                  ? const Color(0xff248DDE)
+                                  : widget.prayerItem[widget.index].status ==
+                                  "لم اصلي"
+                                  ? const Color(0xffC92B2B)
+                                  : widget.prayerItem[widget.index].status ==
+                                  "متأخر"
+                                  ? const Color(0xffCF9C00)
+                                  : widget.prayerItem[widget.index].status ==
+                                  "جماعه"
+                                  ? const Color(0xff1E5B4A)
+                                  : ColorManger.blackColor1),
+                        ),
+                        SizedBox(width: 5.w),
+                        SvgPicture.asset(
+                          widget.prayerItem[widget.index].iconStatusUrl,
+                          width: 24.w,
+                          height: 24.h,
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],
             ),
           ),
-          //----------right section of Icons -------------\\
           Padding(
             padding: EdgeInsets.only(right: 10.w),
             child: Row(
@@ -223,9 +224,7 @@ class _PrayerCategoryState extends State<PrayerCategory> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  width: 6.w,
-                ),
+                SizedBox(width: 6.w),
                 Image.asset(
                   widget.prayerItem[widget.index].iconWeatherUrl,
                   width: 48.w,
