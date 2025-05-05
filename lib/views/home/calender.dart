@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import '../../controller/calender_controller.dart';
 
 class Calendar extends StatelessWidget {
-  final DateController dateController = Get.put(DateController());
+  // Use Get.find to access the already initialized DateController
+  final DateController dateController = Get.find<DateController>();
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +41,16 @@ class Calendar extends StatelessWidget {
               ),
             ),
           )),
-          Obx(() => dateController.canIncrementDate()? IconButton(
-              onPressed: () {
-                dateController.changeDate(1);
-
-              },
-              icon: Icon(
-                Icons.arrow_forward_ios,
-                size: 24.sp,
-                color: const Color(0xff667085),
-              ),
-            ):  SizedBox(height: 24.h,width: 48.w),
+          Obx(() => dateController.canIncrementDate() ? IconButton(
+            onPressed: () {
+              dateController.changeDate(1);
+            },
+            icon: Icon(
+              Icons.arrow_forward_ios,
+              size: 24.sp,
+              color: const Color(0xff667085),
+            ),
+          ) : SizedBox(height: 24.h, width: 48.w),
           ),
         ],
       ),

@@ -2,37 +2,48 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:depi1/models/prayers_model.dart';
+import 'package:depi1/services/prayer_service.dart';
 
 class CardWidgetController extends GetxController {
-  final List<PrayerModel> prayerItem;
+  final todayPrayerItem = RxList<PrayerModel>([]); // استخدام RxList للتحديثات الديناميكية
   late Timer _timer;
   var timeRemaining = '00:00:00'.obs;
   var hijriDate = ''.obs;
   var nextPrayerIndex = 0.obs;
   late DateTime _lastCheckedDate;
 
-  CardWidgetController({required this.prayerItem});
+  CardWidgetController();
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     _lastCheckedDate = DateTime.now();
     hijriDate.value = _getHijriDate();
+    await _loadTodayPrayers(); // تحميل البيانات في البداية
     nextPrayerIndex.value = _getNextPrayerIndex();
     _startTimer();
+  }
+
+  Future<void> _loadTodayPrayers() async {
+    todayPrayerItem.value = await PrayerService.loadPrayerTimes(date: DateTime.now());
+    if (todayPrayerItem.isEmpty) {
+      // حالة افتراضية إذا لم تُحمّل البيانات
+      print("Error: Failed to load prayer times");
+    }
   }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       timeRemaining.value = _calculateTimeRemaining();
 
-      if (DateTime.now().isAfter(prayerItem[nextPrayerIndex.value].time)) {
+      if (DateTime.now().isAfter(todayPrayerItem[nextPrayerIndex.value].time)) {
         nextPrayerIndex.value = _getNextPrayerIndex();
       }
 
       if (_isNewDay()) {
         hijriDate.value = _getHijriDate();
         _lastCheckedDate = DateTime.now();
+        _loadTodayPrayers();
       }
     });
   }
@@ -41,19 +52,19 @@ class CardWidgetController extends GetxController {
 
   int _getNextPrayerIndex() {
     DateTime now = DateTime.now();
-    for (int i = 0; i < prayerItem.length; i++) {
-      if (prayerItem[i].time.isAfter(now)) return i;
+    for (int i = 0; i < todayPrayerItem.length; i++) {
+      if (todayPrayerItem[i].time.isAfter(now)) return i;
     }
     return 0;
   }
 
   String _calculateTimeRemaining() {
     DateTime now = DateTime.now();
-    DateTime nextPrayerTime = prayerItem[nextPrayerIndex.value].time;
+    DateTime nextPrayerTime = todayPrayerItem[nextPrayerIndex.value].time;
 
-    if (nextPrayerIndex.value == prayerItem.length - 1 &&
+    if (nextPrayerIndex.value == todayPrayerItem.length - 1 &&
         now.isAfter(nextPrayerTime)) {
-      nextPrayerTime = prayerItem[0].time.add(const Duration(days: 1));
+      nextPrayerTime = todayPrayerItem[0].time.add(const Duration(days: 1));
     }
 
     if (nextPrayerTime.isBefore(now)) {

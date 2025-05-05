@@ -7,6 +7,7 @@ import '../../controller/calender_controller.dart';
 import '../../models/prayers_model.dart';
 import '../../resources/colors.dart';
 import '../../resources/text_style.dart';
+import '../../services/prayer_service.dart';
 
 class PrayerCategory extends StatefulWidget {
   final int index;
@@ -21,12 +22,13 @@ class PrayerCategory extends StatefulWidget {
 class _PrayerCategoryState extends State<PrayerCategory> {
   bool showNextPrayer = false;
   final DateController dateController = Get.find<DateController>();
+  late final Function disposer;
 
   @override
   void initState() {
     super.initState();
     _updateNextPrayer();
-    ever(dateController.selectedDate, (_) => _updateNextPrayer());
+    disposer = ever(dateController.selectedDate, (_) => _updateNextPrayer());
   }
 
   void _updateNextPrayer() {
@@ -34,6 +36,7 @@ class _PrayerCategoryState extends State<PrayerCategory> {
     DateTime selectedDate = dateController.selectedDate.value;
     int nextPrayerIndex = -1;
 
+    // تحديد الصلاة القادمة بناءً على التاريخ المختار
     bool isToday = selectedDate.year == now.year &&
         selectedDate.month == now.month &&
         selectedDate.day == now.day;
@@ -45,18 +48,39 @@ class _PrayerCategoryState extends State<PrayerCategory> {
           break;
         }
       }
+      // إذا لم نجد صلاة قادمة اليوم، نأخذ الصلاة الأولى لليوم التالي
+      if (nextPrayerIndex == -1 && widget.prayerItem.isNotEmpty) {
+        nextPrayerIndex = 0; // الصلاة الأولى (مثل الفجر) لليوم التالي
+      }
     }
 
-    setState(() {
-      showNextPrayer = isToday && (widget.index == nextPrayerIndex);
-    });
+    if (mounted) {
+      setState(() {
+        showNextPrayer = isToday && (widget.index == nextPrayerIndex);
+      });
+    }
   }
 
   void _handleStatusChange(String status, String icon) {
-    setState(() {
-      widget.prayerItem[widget.index].status = status;
-      widget.prayerItem[widget.index].iconStatusUrl = icon;
-    });
+    if (mounted) {
+      setState(() {
+        widget.prayerItem[widget.index].status = status;
+        widget.prayerItem[widget.index].iconStatusUrl = icon;
+      });
+    }
+
+    PrayerService.updatePrayerStatus(
+      dateController.formattedDateForDb,
+      widget.prayerItem[widget.index].prayerNameAr,
+      status,
+      icon,
+    );
+  }
+
+  @override
+  void dispose() {
+    disposer();
+    super.dispose();
   }
 
   @override
@@ -114,13 +138,10 @@ class _PrayerCategoryState extends State<PrayerCategory> {
                   onTap: () {
                     DateTime now = DateTime.now();
                     DateTime selectedDate = dateController.selectedDate.value;
-                    // Check if the selected date is today
                     bool isToday = selectedDate.year == now.year &&
                         selectedDate.month == now.month &&
                         selectedDate.day == now.day;
 
-                    // If it's today, only allow status change for past prayers
-                    // If it's a past date, allow status change for all prayers
                     if (!isToday || widget.prayerItem[widget.index].time.isBefore(now)) {
                       showDialog(
                         context: context,
@@ -163,31 +184,31 @@ class _PrayerCategoryState extends State<PrayerCategory> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          widget.prayerItem[widget.index].status,
+                          widget.prayerItem[widget.index].status ?? "حدد الحاله",
                           style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                               fontFamily: "Tajawal",
-                              color: widget.prayerItem[widget.index].status ==
-                                  "منفردا"
+                              color: widget.prayerItem[widget.index].status == null
+                                  ? ColorManger.blackColor1
+                                  : widget.prayerItem[widget.index].status == "منفردا"
                                   ? const Color(0xff248DDE)
-                                  : widget.prayerItem[widget.index].status ==
-                                  "لم اصلي"
+                                  : widget.prayerItem[widget.index].status == "لم اصلي"
                                   ? const Color(0xffC92B2B)
-                                  : widget.prayerItem[widget.index].status ==
-                                  "متأخر"
+                                  : widget.prayerItem[widget.index].status == "متأخر"
                                   ? const Color(0xffCF9C00)
-                                  : widget.prayerItem[widget.index].status ==
-                                  "جماعه"
+                                  : widget.prayerItem[widget.index].status == "جماعه"
                                   ? const Color(0xff1E5B4A)
                                   : ColorManger.blackColor1),
                         ),
-                        SizedBox(width: 5.w),
-                        SvgPicture.asset(
-                          widget.prayerItem[widget.index].iconStatusUrl,
-                          width: 24.w,
-                          height: 24.h,
-                        ),
+                        if (widget.prayerItem[widget.index].status != null) ...[
+                          SizedBox(width: 5.w),
+                          SvgPicture.asset(
+                            widget.prayerItem[widget.index].iconStatusUrl!,
+                            width: 24.w,
+                            height: 24.h,
+                          ),
+                        ],
                       ],
                     ),
                   ),

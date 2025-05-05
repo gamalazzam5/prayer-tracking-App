@@ -35,11 +35,42 @@ class SqlDb {
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         "date" TEXT NOT NULL,
         "prayerName" TEXT NOT NULL,
-        "status" TEXT NOT NULL,
-        "statusIconUrl" TEXT NOT NULL
+        "prayerTime" TEXT NOT NULL,
+        "status" TEXT,
+        "statusIconUrl" TEXT
       )
     ''');
     print("onCreate =====================================");
+  }
+
+  // Fetch prayer data for a specific date
+  Future<List<Map>> getPrayersByDate(String date) async {
+    Database? mydb = await db;
+    List<Map> response = await mydb!.rawQuery(
+      'SELECT * FROM prayers WHERE date = ?',
+      [date],
+    );
+    return response;
+  }
+
+  // Insert a new prayer record
+  Future<int> insertPrayer(String date, String prayerName, String prayerTime, String? status, String? statusIconUrl) async {
+    Database? mydb = await db;
+    int response = await mydb!.rawInsert(
+      'INSERT INTO prayers (date, prayerName, prayerTime, status, statusIconUrl) VALUES (?, ?, ?, ?, ?)',
+      [date, prayerName, prayerTime, status, statusIconUrl],
+    );
+    return response;
+  }
+
+  // Update the status of a prayer for a specific date and prayer name
+  Future<int> updatePrayerStatus(String date, String prayerName, String? status, String? statusIconUrl) async {
+    Database? mydb = await db;
+    int response = await mydb!.rawUpdate(
+      'UPDATE prayers SET status = ?, statusIconUrl = ? WHERE date = ? AND prayerName = ?',
+      [status, statusIconUrl, date, prayerName],
+    );
+    return response;
   }
 
   Future<List<Map>> readData(String sql) async {
@@ -64,28 +95,5 @@ class SqlDb {
     Database? mydb = await db;
     int response = await mydb!.rawDelete(sql);
     return response;
-  }
-
-  Future<List<Map>> getPrayersByDate(String date) async {
-    Database? mydb = await db;
-    return await mydb!.rawQuery(
-      'SELECT * FROM prayers WHERE date = ?',
-      [date],
-    );
-  }
-
-  Future<List<Map>> getPrayerStatistics() async {
-    Database? mydb = await db;
-    return await mydb!.rawQuery('''
-      SELECT prayerName, status, COUNT(*) as count
-      FROM prayers
-      GROUP BY prayerName, status
-    ''');
-  }
-
-  Future<int> getTotalPrayersCount() async {
-    Database? mydb = await db;
-    var result = await mydb!.rawQuery('SELECT COUNT(*) as count FROM prayers');
-    return result.first['count'] as int;
   }
 }

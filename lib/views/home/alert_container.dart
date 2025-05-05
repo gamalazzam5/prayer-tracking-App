@@ -10,12 +10,13 @@ class AlertBuildContainer extends StatelessWidget {
   final String text;
   final String image;
 
-  AlertBuildContainer(
-      {super.key,
-        required this.onTap,
-        required this.isSelected,
-        required this.text,
-        required this.image});
+  AlertBuildContainer({
+    super.key,
+    required this.onTap,
+    required this.isSelected,
+    required this.text,
+    required this.image,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +26,7 @@ class AlertBuildContainer extends StatelessWidget {
         width: 270.w,
         height: 40.h,
         decoration: BoxDecoration(
-            color:
-            isSelected ? ColorManger.greenColor0 : ColorManger.primaryColor,
+            color: isSelected ? ColorManger.greenColor0 : ColorManger.primaryColor,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(color: Color(0xffDBE9E5), width: 1.0.w)),
         child: Row(

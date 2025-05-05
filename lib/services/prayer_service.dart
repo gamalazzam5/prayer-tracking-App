@@ -3,45 +3,40 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/prayers_model.dart';
 import '../../resources/image_manager.dart';
+import '../sql/sql_db.dart';
+
 
 class PrayerService {
-  /// Loads prayer times for the current day.
-  /// It first checks if prayer times are already cached for today.
-  /// If not, it fetches new prayer times based on the cached or current location.
-  static Future<List<PrayerModel>> loadPrayerTimes() async {
+  static final SqlDb _sqlDb = SqlDb();
+  static final Map<String, List<PrayerModel>> _cachedPrayers = {};
+
+  /// Initialize prayer times for the last 30 days and next 30 days
+  static Future<void> initializePrayerTimes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedDate = prefs.getString('prayerDate');
     DateTime now = DateTime.now();
 
-    // If there is no stored date or it is not for today, fetch new prayer times
-    if (storedDate == null || DateTime.parse(storedDate).day != now.day) {
-      return await _fetchPrayerTimes();
-    } else {
-      // Load cached prayer times
-      return _getCachedPrayerTimes(prefs);
+    // جلب الموقع إذا لم يكن موجودًا
+    double? latitude = prefs.getDouble('latitude');
+    double? longitude = prefs.getDouble('longitude');
+    if (latitude == null || longitude == null) {
+      Position position = await _getCurrentLocation();
+      latitude = position.latitude;
+      longitude = position.longitude;
+      prefs.setDouble('latitude', latitude);
+      prefs.setDouble('longitude', longitude);
     }
-  }
 
-  /// Fetches prayer times based on the user's stored or current location.
-  /// It retrieves the user's GPS coordinates only if not already cached.
-  static Future<List<PrayerModel>> _fetchPrayerTimes() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      double? latitude = prefs.getDouble('latitude');
-      double? longitude = prefs.getDouble('longitude');
+    final coordinates = Coordinates(latitude, longitude);
+    final params = CalculationMethod.egyptian();
 
-      if (latitude == null || longitude == null) {
-        // Get and store location for the first time
-        Position position = await _getCurrentLocation();
-        latitude = position.latitude;
-        longitude = position.longitude;
-        prefs.setDouble('latitude', latitude);
-        prefs.setDouble('longitude', longitude);
-      }
+    // حساب وتخزين أوقات الصلاة لآخر 30 يومًا وأول 30 يومًا في المستقبل
+    for (int i = -30; i <= 30; i++) {
+      DateTime date = now.add(Duration(days: i));
+      String formattedDate = _formatDate(date);
 
-      final coordinates = Coordinates(latitude, longitude);
-      final params = CalculationMethod.egyptian();
-      final date = DateTime.now();
+      // تحقق مما إذا كانت البيانات موجودة بالفعل
+      var existing = await _sqlDb.getPrayersByDate(formattedDate);
+      if (existing.isNotEmpty) continue; // تخطي إذا كانت البيانات موجودة
 
       final prayerTimes = PrayerTimes(
         coordinates: coordinates,
@@ -58,8 +53,8 @@ class PrayerService {
           iconWeatherUrl: ImageManger.fajrIcon,
           amOrPm: prayerTimes.fajr!.hour >= 12 ? ' PM' : ' AM',
           prayerIcon: ImageManger.fajrIcon,
-          status: '',
-          iconStatusUrl: '',
+          status: null,
+          iconStatusUrl: null,
         ),
         PrayerModel(
           time: prayerTimes.dhuhr!.toLocal(),
@@ -68,8 +63,8 @@ class PrayerService {
           iconWeatherUrl: ImageManger.duhurIcon,
           amOrPm: prayerTimes.dhuhr!.hour >= 12 ? ' PM' : ' AM',
           prayerIcon: ImageManger.duhurIcon,
-          status: '',
-          iconStatusUrl: '',
+          status: null,
+          iconStatusUrl: null,
         ),
         PrayerModel(
           time: prayerTimes.asr!.toLocal(),
@@ -78,8 +73,8 @@ class PrayerService {
           iconWeatherUrl: ImageManger.shurukAndAsrIcon,
           amOrPm: prayerTimes.asr!.hour >= 12 ? ' PM' : ' AM',
           prayerIcon: ImageManger.shurukAndAsrIcon,
-          status: '',
-          iconStatusUrl: '',
+          status: null,
+          iconStatusUrl: null,
         ),
         PrayerModel(
           time: prayerTimes.maghrib!.toLocal(),
@@ -88,8 +83,8 @@ class PrayerService {
           iconWeatherUrl: ImageManger.maghribIcon,
           amOrPm: prayerTimes.maghrib!.hour >= 12 ? ' PM' : ' AM',
           prayerIcon: ImageManger.maghribIcon,
-          status: '',
-          iconStatusUrl: '',
+          status: null,
+          iconStatusUrl: null,
         ),
         PrayerModel(
           time: prayerTimes.isha!.toLocal(),
@@ -98,24 +93,197 @@ class PrayerService {
           iconWeatherUrl: ImageManger.ishaIcon,
           amOrPm: prayerTimes.isha!.hour >= 12 ? ' PM' : ' AM',
           prayerIcon: ImageManger.ishaIcon,
-          status: '',
-          iconStatusUrl: '',
+          status: null,
+          iconStatusUrl: null,
         ),
       ];
 
-      // Store the prayer times in cache
-      prefs.setString('prayerDate', date.toIso8601String());
-      _cachePrayerTimes(prefs, prayers);
-
-      return prayers;
-    } catch (e) {
-      print('Error fetching prayer times: $e');
-      return [];
+      // حفظ البيانات في قاعدة البيانات
+      for (var prayer in prayers) {
+        await _sqlDb.insertPrayer(
+          formattedDate,
+          prayer.prayerNameAr,
+          prayer.time.toIso8601String(),
+          prayer.status,
+          prayer.iconStatusUrl,
+        );
+      }
     }
   }
 
-  /// Retrieves the current location of the user using the Geolocator package.
-  /// It requests location permissions if they are not already granted.
+  /// Loads prayer times from the database
+  static Future<List<PrayerModel>> loadPrayerTimes({DateTime? date}) async {
+    DateTime now = date ?? DateTime.now();
+    String formattedDate = _formatDate(now);
+
+    // تحقق من التخزين المؤقت أولاً
+    if (_cachedPrayers.containsKey(formattedDate)) {
+      return _cachedPrayers[formattedDate]!;
+    }
+
+    // جلب البيانات من قاعدة البيانات
+    var dbPrayers = await _sqlDb.getPrayersByDate(formattedDate);
+    if (dbPrayers.isEmpty) {
+      // إذا لم تكن البيانات موجودة، أنشئها
+      await _fetchPrayerTimes(date: now);
+      dbPrayers = await _sqlDb.getPrayersByDate(formattedDate);
+    }
+
+    List<PrayerModel> prayers = dbPrayers.map((dbPrayer) {
+      return PrayerModel(
+        time: DateTime.parse(dbPrayer['prayerTime']),
+        prayerNameAr: dbPrayer['prayerName'],
+        prayerNameEN: _getEnglishName(dbPrayer['prayerName']),
+        iconWeatherUrl: _getIconUrl(dbPrayer['prayerName']),
+        amOrPm: DateTime.parse(dbPrayer['prayerTime']).hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: _getIconUrl(dbPrayer['prayerName']),
+        status: dbPrayer['status'],
+        iconStatusUrl: dbPrayer['statusIconUrl'],
+      );
+    }).toList();
+
+    _cachedPrayers[formattedDate] = prayers;
+    return prayers;
+  }
+
+  static Future<List<PrayerModel>> _fetchPrayerTimes({required DateTime date}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double? latitude = prefs.getDouble('latitude');
+    double? longitude = prefs.getDouble('longitude');
+
+    if (latitude == null || longitude == null) {
+      Position position = await _getCurrentLocation();
+      latitude = position.latitude;
+      longitude = position.longitude;
+      prefs.setDouble('latitude', latitude);
+      prefs.setDouble('longitude', longitude);
+    }
+
+    final coordinates = Coordinates(latitude, longitude);
+    final params = CalculationMethod.egyptian();
+    final prayerTimes = PrayerTimes(
+      coordinates: coordinates,
+      date: date,
+      calculationParameters: params,
+      precision: true,
+    );
+
+    List<PrayerModel> prayers = [
+      PrayerModel(
+        time: prayerTimes.fajr!.toLocal(),
+        prayerNameAr: "الفجر",
+        prayerNameEN: "Fajr",
+        iconWeatherUrl: ImageManger.fajrIcon,
+        amOrPm: prayerTimes.fajr!.hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: ImageManger.fajrIcon,
+        status: null,
+        iconStatusUrl: null,
+      ),
+      PrayerModel(
+        time: prayerTimes.dhuhr!.toLocal(),
+        prayerNameAr: "الظهر",
+        prayerNameEN: "Dhuhr",
+        iconWeatherUrl: ImageManger.duhurIcon,
+        amOrPm: prayerTimes.dhuhr!.hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: ImageManger.duhurIcon,
+        status: null,
+        iconStatusUrl: null,
+      ),
+      PrayerModel(
+        time: prayerTimes.asr!.toLocal(),
+        prayerNameAr: "العصر",
+        prayerNameEN: "Asr",
+        iconWeatherUrl: ImageManger.shurukAndAsrIcon,
+        amOrPm: prayerTimes.asr!.hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: ImageManger.shurukAndAsrIcon,
+        status: null,
+        iconStatusUrl: null,
+      ),
+      PrayerModel(
+        time: prayerTimes.maghrib!.toLocal(),
+        prayerNameAr: "المغرب",
+        prayerNameEN: "Maghrib",
+        iconWeatherUrl: ImageManger.maghribIcon,
+        amOrPm: prayerTimes.maghrib!.hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: ImageManger.maghribIcon,
+        status: null,
+        iconStatusUrl: null,
+      ),
+      PrayerModel(
+        time: prayerTimes.isha!.toLocal(),
+        prayerNameAr: "العشاء",
+        prayerNameEN: "Isha",
+        iconWeatherUrl: ImageManger.ishaIcon,
+        amOrPm: prayerTimes.isha!.hour >= 12 ? ' PM' : ' AM',
+        prayerIcon: ImageManger.ishaIcon,
+        status: null,
+        iconStatusUrl: null,
+      ),
+    ];
+
+    String formattedDate = _formatDate(date);
+    for (var prayer in prayers) {
+      await _sqlDb.insertPrayer(
+        formattedDate,
+        prayer.prayerNameAr,
+        prayer.time.toIso8601String(),
+        prayer.status,
+        prayer.iconStatusUrl,
+      );
+    }
+
+    return prayers;
+  }
+
+  static Future<void> updatePrayerStatus(String date, String prayerName, String? status, String? statusIconUrl) async {
+    await _sqlDb.updatePrayerStatus(date, prayerName, status, statusIconUrl);
+    // تحديث التخزين المؤقت إذا كان موجودًا
+    if (_cachedPrayers.containsKey(date)) {
+      var prayers = _cachedPrayers[date]!;
+      var prayer = prayers.firstWhere((p) => p.prayerNameAr == prayerName);
+      prayer.status = status;
+      prayer.iconStatusUrl = statusIconUrl;
+    }
+  }
+
+  static String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  static String _getEnglishName(String prayerNameAr) {
+    switch (prayerNameAr) {
+      case "الفجر":
+        return "Fajr";
+      case "الظهر":
+        return "Dhuhr";
+      case "العصر":
+        return "Asr";
+      case "المغرب":
+        return "Maghrib";
+      case "العشاء":
+        return "Isha";
+      default:
+        return "";
+    }
+  }
+
+  static String _getIconUrl(String prayerNameAr) {
+    switch (prayerNameAr) {
+      case "الفجر":
+        return ImageManger.fajrIcon;
+      case "الظهر":
+        return ImageManger.duhurIcon;
+      case "العصر":
+        return ImageManger.shurukAndAsrIcon;
+      case "المغرب":
+        return ImageManger.maghribIcon;
+      case "العشاء":
+        return ImageManger.ishaIcon;
+      default:
+        return "";
+    }
+  }
+
   static Future<Position> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) throw Exception('Location services are disabled.');
@@ -129,51 +297,9 @@ class PrayerService {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      throw Exception(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
-  }
-
-  /// Caches the fetched prayer times in SharedPreferences for offline use.
-  static void _cachePrayerTimes(SharedPreferences prefs, List<PrayerModel> prayers) {
-    for (int i = 0; i < prayers.length; i++) {
-      prefs.setString('prayerTime_$i', prayers[i].time.toIso8601String());
-    }
-  }
-
-  /// Retrieves cached prayer times from SharedPreferences.
-  static List<PrayerModel> _getCachedPrayerTimes(SharedPreferences prefs) {
-    List<PrayerModel> cachedPrayers = [];
-    for (int i = 0; i < 5; i++) {
-      String? timeString = prefs.getString('prayerTime_$i');
-      if (timeString != null) {
-        DateTime time = DateTime.parse(timeString);
-        cachedPrayers.add(PrayerModel(
-          time: time,
-          prayerNameAr: ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"][i],
-          prayerNameEN: ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"][i],
-          iconWeatherUrl: [
-            ImageManger.fajrIcon,
-            ImageManger.duhurIcon,
-            ImageManger.shurukAndAsrIcon,
-            ImageManger.maghribIcon,
-            ImageManger.ishaIcon
-          ][i],
-          amOrPm: time.hour >= 12 ? ' PM' : ' AM',
-          prayerIcon: [
-            ImageManger.fajrIcon,
-            ImageManger.duhurIcon,
-            ImageManger.shurukAndAsrIcon,
-            ImageManger.maghribIcon,
-            ImageManger.ishaIcon
-          ][i],
-          status: '',
-          iconStatusUrl: '',
-        ));
-      }
-    }
-    return cachedPrayers;
   }
 }

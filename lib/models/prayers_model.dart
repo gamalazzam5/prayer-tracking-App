@@ -1,21 +1,21 @@
 class PrayerModel {
   DateTime time;
-  final String amOrPm;
-  String status;
-  String iconStatusUrl;
-  final String prayerNameAr;
-  final String prayerNameEN;
-  final String prayerIcon;
-  final String iconWeatherUrl;
+  String prayerNameAr;
+  String prayerNameEN;
+  String iconWeatherUrl;
+  String amOrPm;
+  String prayerIcon;
+  String? status;
+  String? iconStatusUrl;
 
   PrayerModel({
-    required this.amOrPm,
     required this.time,
-    required this.status,
-    required this.iconStatusUrl,
     required this.prayerNameAr,
     required this.prayerNameEN,
-    required this.prayerIcon,
     required this.iconWeatherUrl,
+    required this.amOrPm,
+    required this.prayerIcon,
+    this.status,
+    this.iconStatusUrl,
   });
 }

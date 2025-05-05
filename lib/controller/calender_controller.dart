@@ -1,4 +1,6 @@
+
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class DateController extends GetxController {
   var selectedDate = DateTime.now().obs;
@@ -14,6 +16,7 @@ class DateController extends GetxController {
     }
 
     selectedDate.value = newDate;
+    update(); // Notify listeners to rebuild UI
   }
 
   bool canIncrementDate() {
@@ -28,6 +31,11 @@ class DateController extends GetxController {
     final month = _getMonthName(date.month);
     final year = date.year.toString();
     return "$day $month $year";
+  }
+
+  String get formattedDateForDb {
+    final date = selectedDate.value;
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   String _getMonthName(int month) {
