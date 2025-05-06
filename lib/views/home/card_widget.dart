@@ -49,7 +49,7 @@ class CardWidget extends StatelessWidget {
             top: 27.h,
             right: 16.w,
             child: SizedBox(
-              width: 180.w,
+              width: 190.w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
