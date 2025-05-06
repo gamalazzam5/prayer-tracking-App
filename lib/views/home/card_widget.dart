@@ -49,7 +49,7 @@ class CardWidget extends StatelessWidget {
             top: 27.h,
             right: 16.w,
             child: SizedBox(
-              width: 175.w,
+              width: 180.w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -70,7 +70,7 @@ class CardWidget extends StatelessWidget {
                           )),
                         ),
                       ),
-                      SizedBox(width: 8.w),
+                       SizedBox(width: 1.w),
                       Expanded(
                         child: Obx(() => Text(
                           "سيبدأ ${controller.todayPrayerItem[controller.nextPrayerIndex.value].prayerNameAr} بعد",

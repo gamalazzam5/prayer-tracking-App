@@ -19,16 +19,16 @@ class CustomCard extends StatelessWidget {
 
   CustomCard(
       {super.key,
-      required this.color,
-      required this.fajrBar,
-      required this.statusText,
-      required this.percentage,
-      required this.count,
-      required this.iconUrl,
-      required this.dhurBar,
-      required this.asrBar,
-      required this.maghribBar,
-      required this.ishaBar});
+        required this.color,
+        required this.fajrBar,
+        required this.statusText,
+        required this.percentage,
+        required this.count,
+        required this.iconUrl,
+        required this.dhurBar,
+        required this.asrBar,
+        required this.maghribBar,
+        required this.ishaBar});
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +53,25 @@ class CustomCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AnalysisState(
+              AnimatedAnalysisState(
                 color: color,
-                width: fajrBar.w,
+                targetWidth: fajrBar.w,
               ),
-              AnalysisState(
+              AnimatedAnalysisState(
                 color: color,
-                width: dhurBar.w,
+                targetWidth: dhurBar.w,
               ),
-              AnalysisState(
+              AnimatedAnalysisState(
                 color: color,
-                width: asrBar.w,
+                targetWidth: asrBar.w,
               ),
-              AnalysisState(
+              AnimatedAnalysisState(
                 color: color,
-                width: maghribBar.w,
+                targetWidth: maghribBar.w,
               ),
-              AnalysisState(
+              AnimatedAnalysisState(
                 color: color,
-                width: ishaBar.w,
+                targetWidth: ishaBar.w,
               )
             ],
           ),
