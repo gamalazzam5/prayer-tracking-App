@@ -36,21 +36,24 @@ class _PrayerCategoryState extends State<PrayerCategory> {
     DateTime selectedDate = dateController.selectedDate.value;
     int nextPrayerIndex = -1;
 
-    // تحديد الصلاة القادمة بناءً على التاريخ المختار
+
     bool isToday = selectedDate.year == now.year &&
         selectedDate.month == now.month &&
         selectedDate.day == now.day;
 
-    if (isToday) {
+    if (isToday && widget.prayerItem.isNotEmpty) {
       for (int i = 0; i < widget.prayerItem.length; i++) {
         if (now.isBefore(widget.prayerItem[i].time)) {
           nextPrayerIndex = i;
           break;
         }
       }
-      // إذا لم نجد صلاة قادمة اليوم، نأخذ الصلاة الأولى لليوم التالي
-      if (nextPrayerIndex == -1 && widget.prayerItem.isNotEmpty) {
-        nextPrayerIndex = 0; // الصلاة الأولى (مثل الفجر) لليوم التالي
+
+      if (nextPrayerIndex == -1) {
+        DateTime lastPrayerTime = widget.prayerItem.last.time;
+        if (now.isAfter(lastPrayerTime)) {
+          nextPrayerIndex = 0;
+        }
       }
     }
 

@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         child: prayerItem.isNotEmpty
             ? Column(
           children: [
-            CardWidget(), // لا حاجة لتمرير prayerItem لأن CardWidget يعتمد على اليوم الحالي
+            CardWidget(),
             SizedBox(height: 16.h),
             Calendar(),
             SizedBox(height: 8.h),

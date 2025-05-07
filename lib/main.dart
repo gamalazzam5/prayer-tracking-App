@@ -8,19 +8,19 @@ import 'package:flutter/services.dart'; // للتحكم في توجيه الشا
 import 'controller/calender_controller.dart';
 
 void main() async {
-  // التأكد من تهيئة كل شيء
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  // تثبيت التوجيه في وضعية portrait فقط
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // تهيئة DateController
+
   Get.put(DateController());
 
-  // تهيئة بيانات الصلاة لآخر 30 يومًا وأول 30 يومًا في المستقبل
+
   await PrayerService.initializePrayerTimes();
 
   runApp(const Salaty());

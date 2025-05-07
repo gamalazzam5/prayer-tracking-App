@@ -14,9 +14,9 @@ class AnimatedAnalysisState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 500), // مدة الحركة السلسة
-      curve: Curves.easeInOut, // نوع الحركة
-      tween: Tween<double>(begin: 10, end: targetWidth), // من الحد الأدنى إلى العرض المستهدف
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      tween: Tween<double>(begin: 10, end: targetWidth),
       builder: (context, value, child) {
         return Container(
           margin: EdgeInsets.only(bottom: 4.h),

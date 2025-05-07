@@ -5,7 +5,7 @@ import 'package:depi1/models/prayers_model.dart';
 import 'package:depi1/services/prayer_service.dart';
 
 class CardWidgetController extends GetxController {
-  final todayPrayerItem = RxList<PrayerModel>([]); // استخدام RxList للتحديثات الديناميكية
+  final todayPrayerItem = RxList<PrayerModel>([]);
   late Timer _timer;
   var timeRemaining = '00:00:00'.obs;
   var hijriDate = ''.obs;
@@ -19,7 +19,7 @@ class CardWidgetController extends GetxController {
     super.onInit();
     _lastCheckedDate = DateTime.now();
     hijriDate.value = _getHijriDate();
-    await _loadTodayPrayers(); // تحميل البيانات في البداية
+    await _loadTodayPrayers();
     nextPrayerIndex.value = _getNextPrayerIndex();
     _startTimer();
   }
@@ -27,7 +27,7 @@ class CardWidgetController extends GetxController {
   Future<void> _loadTodayPrayers() async {
     todayPrayerItem.value = await PrayerService.loadPrayerTimes(date: DateTime.now());
     if (todayPrayerItem.isEmpty) {
-      // حالة افتراضية إذا لم تُحمّل البيانات
+
       print("Error: Failed to load prayer times");
     }
   }

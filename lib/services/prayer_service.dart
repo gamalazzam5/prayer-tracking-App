@@ -15,7 +15,7 @@ class PrayerService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DateTime now = DateTime.now();
 
-    // جلب الموقع إذا لم يكن موجودًا
+   ///get current location if it doesn't existed
     double? latitude = prefs.getDouble('latitude');
     double? longitude = prefs.getDouble('longitude');
     if (latitude == null || longitude == null) {
@@ -29,14 +29,14 @@ class PrayerService {
     final coordinates = Coordinates(latitude, longitude);
     final params = CalculationMethod.egyptian();
 
-    // حساب وتخزين أوقات الصلاة لآخر 30 يومًا وأول 30 يومًا في المستقبل
+//calculate and store prayer time before 30 days and after 30 days
     for (int i = -30; i <= 30; i++) {
       DateTime date = now.add(Duration(days: i));
       String formattedDate = _formatDate(date);
 
-      // تحقق مما إذا كانت البيانات موجودة بالفعل
+      //check if the information is existing or not
       var existing = await _sqlDb.getPrayersByDate(formattedDate);
-      if (existing.isNotEmpty) continue; // تخطي إذا كانت البيانات موجودة
+      if (existing.isNotEmpty) continue;// here skip if the information is existed
 
       final prayerTimes = PrayerTimes(
         coordinates: coordinates,
@@ -98,7 +98,7 @@ class PrayerService {
         ),
       ];
 
-      // حفظ البيانات في قاعدة البيانات
+     ///store data in the sqflite
       for (var prayer in prayers) {
         await _sqlDb.insertPrayer(
           formattedDate,
@@ -116,15 +116,15 @@ class PrayerService {
     DateTime now = date ?? DateTime.now();
     String formattedDate = _formatDate(now);
 
-    // تحقق من التخزين المؤقت أولاً
+    ///check if the data in the cache or not
     if (_cachedPrayers.containsKey(formattedDate)) {
       return _cachedPrayers[formattedDate]!;
     }
 
-    // جلب البيانات من قاعدة البيانات
+   ///get data from Database
     var dbPrayers = await _sqlDb.getPrayersByDate(formattedDate);
     if (dbPrayers.isEmpty) {
-      // إذا لم تكن البيانات موجودة، أنشئها
+      ///if the it doesn't existed create it
       await _fetchPrayerTimes(date: now);
       dbPrayers = await _sqlDb.getPrayersByDate(formattedDate);
     }
@@ -237,7 +237,7 @@ class PrayerService {
 
   static Future<void> updatePrayerStatus(String date, String prayerName, String? status, String? statusIconUrl) async {
     await _sqlDb.updatePrayerStatus(date, prayerName, status, statusIconUrl);
-    // تحديث التخزين المؤقت إذا كان موجودًا
+   /// update the date if it available
     if (_cachedPrayers.containsKey(date)) {
       var prayers = _cachedPrayers[date]!;
       var prayer = prayers.firstWhere((p) => p.prayerNameAr == prayerName);

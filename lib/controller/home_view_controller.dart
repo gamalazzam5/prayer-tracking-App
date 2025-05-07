@@ -15,14 +15,14 @@ class HomeViewController extends GetxController {
     HomePage(),
     BuildQiblah(),
     StaticPage(),
-    Container(),
+
   ];
 
   final List<Map<String, dynamic>> navItems = [
     {"icon": "mosque.png", "label": "الرئيسية"},
     {"icon": "kaaba.png", "label": "القِبْلَة"},
     {"icon": "statics.png", "label": "الإحصائيات"},
-    {"icon": Icons.settings, "label": "الإعدادات"},
+
   ];
 
   ///here i will use GetBuilder as i didn't use Stream and it more faster and lower Memory

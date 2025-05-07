@@ -23,7 +23,7 @@ class CardWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // الصور في الخلفية
+
           Positioned(
             bottom: 0.h,
             left: 23.w,
@@ -49,7 +49,7 @@ class CardWidget extends StatelessWidget {
             top: 27.h,
             right: 16.w,
             child: SizedBox(
-              width: 190.w,
+              width: 182.w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -101,6 +101,6 @@ class CardWidget extends StatelessWidget {
         ],
       ),
     )
-        : Container()); // عرض حاوية فارغة إذا لم تُحمّل البيانات
+        : Container());
   }
 }
