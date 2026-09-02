@@ -18,6 +18,7 @@ class QiblaScreen extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 20.h),
             Text('القِبْلَة', style: AppTextStyles.screenTitle),

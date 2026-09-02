@@ -1,4 +1,4 @@
-import 'dart:math' show pi;
+import 'dart:math' show pi, min;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,44 +17,68 @@ import '../../domain/entities/qibla_direction_entity.dart';
 class QiblaCompass extends StatelessWidget {
   final QiblaDirectionEntity direction;
 
+  /// Largest side the dial is allowed to take when there is room to spare.
+  static const double _maxDialSize = 320;
+
   const QiblaCompass({super.key, required this.direction});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _AlignmentHint(offset: direction.offsetFromDevice),
-        SizedBox(height: 16.h),
-        SizedBox(
-          height: 320.h,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // AnimatedRotation smooths out raw magnetometer jitter, which
-              // otherwise makes the dial visibly twitch.
-              AnimatedRotation(
-                turns: -direction.deviceHeading / 360,
-                duration: const Duration(milliseconds: 200),
-                child: SvgPicture.asset(
-                  AppAssets.qiblaDial,
-                  height: 300.h,
-                  fit: BoxFit.contain,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Square dial sized to the smaller side so it stays fully visible and
+        // exactly centred on any screen.
+        final size = min(
+          min(constraints.maxWidth, constraints.maxHeight),
+          _maxDialSize.r,
+        );
+
+        // The hint is overlaid rather than stacked in a Column so it cannot
+        // push the dial off the centre of the available area.
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Center(
+              child: SizedBox.square(
+                dimension: size,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // AnimatedRotation smooths out raw magnetometer jitter,
+                    // which otherwise makes the dial visibly twitch.
+                    AnimatedRotation(
+                      turns: -direction.deviceHeading / 360,
+                      duration: const Duration(milliseconds: 200),
+                      child: SvgPicture.asset(
+                        AppAssets.qiblaDial,
+                        width: size,
+                        height: size,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    Transform.rotate(
+                      angle: direction.offsetFromDevice * pi / 180,
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        AppAssets.qiblaNeedle,
+                        width: size,
+                        height: size,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Transform.rotate(
-                angle: direction.offsetFromDevice * pi / 180,
-                alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  AppAssets.qiblaNeedle,
-                  height: 300.h,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _AlignmentHint(offset: direction.offsetFromDevice),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -79,6 +103,7 @@ class _AlignmentHint extends StatelessWidget {
         Text(
           isAligned ? 'أنت تواجه القبلة' : 'أدر جهازك ناحية السهم',
           textDirection: TextDirection.rtl,
+          textAlign: TextAlign.center,
           style: AppTextStyles.bodyBold.copyWith(
             color: isAligned ? AppColors.green : AppColors.textSecondary,
           ),
@@ -86,6 +111,7 @@ class _AlignmentHint extends StatelessWidget {
         SizedBox(height: 4.h),
         Text(
           '${delta.round()}°',
+          textAlign: TextAlign.center,
           style: AppTextStyles.dateLabel.copyWith(
             color: isAligned ? AppColors.green : AppColors.textTertiary,
           ),
