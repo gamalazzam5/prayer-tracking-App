@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 
-import 'package:depi1/core/error/exceptions.dart';
-import 'package:depi1/core/error/failures.dart';
-import 'package:depi1/core/location/coordinates.dart';
-import 'package:depi1/core/location/location_service.dart';
-import 'package:depi1/features/qibla/data/datasources/compass_data_source.dart';
-import 'package:depi1/features/qibla/data/repos/qibla_repository_impl.dart';
-import 'package:depi1/features/qibla/domain/entities/qibla_direction_entity.dart';
-import 'package:depi1/features/qibla/domain/services/qibla_bearing_calculator.dart';
+import 'package:salaty/core/error/exceptions.dart';
+import 'package:salaty/core/error/failures.dart';
+import 'package:salaty/core/location/coordinates.dart';
+import 'package:salaty/core/location/location_service.dart';
+import 'package:salaty/features/qibla/data/datasources/compass_data_source.dart';
+import 'package:salaty/features/qibla/data/repos/qibla_repository_impl.dart';
+import 'package:salaty/features/qibla/domain/entities/qibla_direction_entity.dart';
+import 'package:salaty/features/qibla/domain/services/qibla_bearing_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

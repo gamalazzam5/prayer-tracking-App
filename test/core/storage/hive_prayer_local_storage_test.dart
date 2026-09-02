@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:depi1/core/error/exceptions.dart';
-import 'package:depi1/core/storage/hive_prayer_local_storage.dart';
-import 'package:depi1/core/storage/prayer_record.dart';
+import 'package:salaty/core/error/exceptions.dart';
+import 'package:salaty/core/storage/hive_prayer_local_storage.dart';
+import 'package:salaty/core/storage/prayer_record.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 

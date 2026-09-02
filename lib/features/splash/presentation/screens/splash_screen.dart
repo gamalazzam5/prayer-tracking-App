@@ -35,7 +35,7 @@ class SplashScreen extends StatelessWidget {
               Image.asset(AppAssets.splash, height: 187.h, width: 250.w),
               SizedBox(height: 16.h),
               Text(
-                'صلاتك اولا',
+                'صلاتك أولاً',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.splashTitle,
               ),

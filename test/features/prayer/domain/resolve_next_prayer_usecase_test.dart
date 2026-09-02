@@ -1,6 +1,6 @@
-import 'package:depi1/features/prayer/domain/entities/prayer_entity.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_name.dart';
-import 'package:depi1/features/prayer/domain/usecases/resolve_next_prayer_usecase.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_entity.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_name.dart';
+import 'package:salaty/features/prayer/domain/usecases/resolve_next_prayer_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

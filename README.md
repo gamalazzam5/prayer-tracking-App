@@ -1,4 +1,4 @@
-# صلاتك اولا — Salaty
+# صلاتك أولاً — Salaty
 
 A prayer-tracking app: daily prayer times, a record of how each prayer was
 performed, a qibla compass, and progress statistics.

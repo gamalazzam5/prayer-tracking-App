@@ -1,6 +1,6 @@
-import 'package:depi1/core/error/exceptions.dart';
-import 'package:depi1/core/location/coordinates.dart';
-import 'package:depi1/core/location/geolocator_location_service.dart';
+import 'package:salaty/core/error/exceptions.dart';
+import 'package:salaty/core/location/coordinates.dart';
+import 'package:salaty/core/location/geolocator_location_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';

@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:depi1/core/error/exceptions.dart';
-import 'package:depi1/core/error/failures.dart';
-import 'package:depi1/core/storage/prayer_local_storage.dart';
-import 'package:depi1/core/storage/prayer_record.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_name.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_status.dart';
-import 'package:depi1/features/statistics/data/repos/statistics_repository_impl.dart';
-import 'package:depi1/features/statistics/domain/entities/prayer_statistics_entity.dart';
-import 'package:depi1/features/statistics/domain/entities/status_breakdown_entity.dart';
+import 'package:salaty/core/error/exceptions.dart';
+import 'package:salaty/core/error/failures.dart';
+import 'package:salaty/core/storage/prayer_local_storage.dart';
+import 'package:salaty/core/storage/prayer_record.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_name.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_status.dart';
+import 'package:salaty/features/statistics/data/repos/statistics_repository_impl.dart';
+import 'package:salaty/features/statistics/domain/entities/prayer_statistics_entity.dart';
+import 'package:salaty/features/statistics/domain/entities/status_breakdown_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

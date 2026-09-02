@@ -1,5 +1,5 @@
-import 'package:depi1/core/location/coordinates.dart';
-import 'package:depi1/features/qibla/domain/services/qibla_bearing_calculator.dart';
+import 'package:salaty/core/location/coordinates.dart';
+import 'package:salaty/features/qibla/domain/services/qibla_bearing_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

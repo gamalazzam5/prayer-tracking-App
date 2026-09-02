@@ -1,4 +1,4 @@
-import 'package:depi1/features/qibla/domain/entities/qibla_direction_entity.dart';
+import 'package:salaty/features/qibla/domain/entities/qibla_direction_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

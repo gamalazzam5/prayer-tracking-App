@@ -1,13 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
-import 'package:depi1/core/error/failures.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_entity.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_name.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_status.dart';
-import 'package:depi1/features/prayer/domain/usecases/get_prayers_for_date_usecase.dart';
-import 'package:depi1/features/prayer/domain/usecases/update_prayer_status_usecase.dart';
-import 'package:depi1/features/prayer/presentation/cubit/prayer_cubit.dart';
-import 'package:depi1/features/prayer/presentation/cubit/prayer_state.dart';
+import 'package:salaty/core/error/failures.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_entity.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_name.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_status.dart';
+import 'package:salaty/features/prayer/domain/usecases/get_prayers_for_date_usecase.dart';
+import 'package:salaty/features/prayer/domain/usecases/update_prayer_status_usecase.dart';
+import 'package:salaty/features/prayer/presentation/cubit/prayer_cubit.dart';
+import 'package:salaty/features/prayer/presentation/cubit/prayer_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

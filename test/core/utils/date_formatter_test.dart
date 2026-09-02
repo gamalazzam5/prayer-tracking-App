@@ -1,4 +1,4 @@
-import 'package:depi1/core/utils/date_formatter.dart';
+import 'package:salaty/core/utils/date_formatter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
-import 'package:depi1/core/error/failures.dart';
-import 'package:depi1/features/onboarding/domain/usecases/has_seen_onboarding_usecase.dart';
-import 'package:depi1/features/prayer/domain/usecases/seed_prayer_times_usecase.dart';
-import 'package:depi1/features/splash/presentation/cubit/splash_cubit.dart';
-import 'package:depi1/features/splash/presentation/cubit/splash_state.dart';
+import 'package:salaty/core/error/failures.dart';
+import 'package:salaty/features/onboarding/domain/usecases/has_seen_onboarding_usecase.dart';
+import 'package:salaty/features/prayer/domain/usecases/seed_prayer_times_usecase.dart';
+import 'package:salaty/features/splash/presentation/cubit/splash_cubit.dart';
+import 'package:salaty/features/splash/presentation/cubit/splash_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

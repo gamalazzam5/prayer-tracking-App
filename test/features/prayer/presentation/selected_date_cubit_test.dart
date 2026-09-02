@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:depi1/features/prayer/presentation/cubit/selected_date_cubit.dart';
-import 'package:depi1/features/prayer/presentation/cubit/selected_date_state.dart';
+import 'package:salaty/features/prayer/presentation/cubit/selected_date_cubit.dart';
+import 'package:salaty/features/prayer/presentation/cubit/selected_date_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

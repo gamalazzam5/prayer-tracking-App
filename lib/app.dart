@@ -15,7 +15,7 @@ class SalatyApp extends StatelessWidget {
       minTextAdapt: true,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'صلاتك اولا',
+        title: 'صلاتك أولاً',
         theme: ThemeData(
           scaffoldBackgroundColor: AppColors.scaffold,
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.green),

@@ -1,7 +1,7 @@
-import 'package:depi1/features/prayer/domain/entities/prayer_entity.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_name.dart';
-import 'package:depi1/features/prayer/domain/entities/prayer_status.dart';
-import 'package:depi1/features/prayer/presentation/widgets/prayer_tile.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_entity.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_name.dart';
+import 'package:salaty/features/prayer/domain/entities/prayer_status.dart';
+import 'package:salaty/features/prayer/presentation/widgets/prayer_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';

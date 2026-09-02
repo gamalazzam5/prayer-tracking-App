@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
-import 'package:depi1/core/error/failures.dart';
-import 'package:depi1/features/statistics/domain/entities/prayer_statistics_entity.dart';
-import 'package:depi1/features/statistics/domain/entities/weekly_achievement_entity.dart';
-import 'package:depi1/features/statistics/domain/usecases/get_statistics_usecase.dart';
-import 'package:depi1/features/statistics/domain/usecases/watch_statistics_changes_usecase.dart';
-import 'package:depi1/features/statistics/presentation/cubit/statistics_cubit.dart';
-import 'package:depi1/features/statistics/presentation/cubit/statistics_state.dart';
+import 'package:salaty/core/error/failures.dart';
+import 'package:salaty/features/statistics/domain/entities/prayer_statistics_entity.dart';
+import 'package:salaty/features/statistics/domain/entities/weekly_achievement_entity.dart';
+import 'package:salaty/features/statistics/domain/usecases/get_statistics_usecase.dart';
+import 'package:salaty/features/statistics/domain/usecases/watch_statistics_changes_usecase.dart';
+import 'package:salaty/features/statistics/presentation/cubit/statistics_cubit.dart';
+import 'package:salaty/features/statistics/presentation/cubit/statistics_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
