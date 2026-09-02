@@ -47,6 +47,23 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   plugin_platform_interface: ^2.1.8
 
+  # Generates the launcher icons for every Android density and iOS size from
+  # a single source image. Build-time only; nothing ships in the app.
+  flutter_launcher_icons: ^0.14.4
+
+# Launcher icon generation: run `dart run flutter_launcher_icons` after
+# changing assets/icon/*.
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: true
+  # Adaptive icon: Android crops the foreground to its own mask, so the art is
+  # inset into the safe zone and the brand white sits behind it.
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  ios: true
+  # iOS icons cannot contain transparency.
+  remove_alpha_ios: true
+
 flutter:
   uses-material-design: true
 
