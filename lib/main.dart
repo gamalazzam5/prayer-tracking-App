@@ -1,43 +1,21 @@
-import 'package:depi1/services/prayer_service.dart';
-import 'package:depi1/views/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:flutter/services.dart'; // للتحكم في توجيه الشاشة
+import 'package:flutter/services.dart';
 
-import 'controller/calender_controller.dart';
+import 'app.dart';
+import 'core/di/injection_container.dart';
 
-void main() async {
-
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
+  // Only local wiring happens before `runApp`. Anything that can fail or block
+  // — location, prayer-time seeding — runs behind the splash screen instead,
+  // so a denied permission can no longer leave the user on a white screen.
+  await initDependencies();
 
-  Get.put(DateController());
-
-
-  await PrayerService.initializePrayerTimes();
-
-  runApp(const Salaty());
-}
-
-class Salaty extends StatelessWidget {
-  const Salaty({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const ScreenUtilInit(
-      designSize: Size(402, 880),
-      minTextAdapt: true,
-      child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
-      ),
-    );
-  }
+  runApp(const SalatyApp());
 }
